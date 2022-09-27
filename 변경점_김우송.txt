@@ -1,0 +1,61 @@
+
+위에 변수 추가
+public static boolean start = false;
+private BufferedImage mainImage;
+
+//GalaGame변경
+    public GalagaGame() {
+        JFrame frame = new JFrame("Galaga Game");
+
+        frame.setSize(850, 600);
+        frame.add(this);
+        frame.setResizable(false);
+        frame.setVisible(true);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        try {
+            mainImage = ImageIO.read(new File("images/mainImage.png")); // 메인페이지 추가
+            shotImage = ImageIO.read(new File("images/fire.png"));
+            shipImage = ImageIO.read(new File("images/starship02.jpg"));
+            alienImage = ImageIO.read(new File("images/alien.png"));
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        this.requestFocus();
+        this.initSprites();
+        addKeyListener(this);
+    }
+
+// paint 변경
+@Override
+    public void paint(Graphics g) {
+        if (start == false) {
+            super.paint(g);
+            g.setColor(Color.white);
+            g.drawImage(mainImage, 0, 0, null);
+        } else if (start == true) {
+            repaint();
+            super.paint(g);
+            g.setColor(Color.black);
+            g.fillRect(0, 0, 850, 600);
+            for (int i = 0; i < sprites.size(); i++) {
+                Sprite sprite = (Sprite) sprites.get(i);
+                sprite.draw(g);
+            }
+        }
+    }
+
+// keyPressed 변경
+@Override
+    public void keyPressed(KeyEvent e) {
+        if (start == false && (e.getKeyCode() == KeyEvent.VK_SPACE))
+            start = true;
+        else if (start == true && (e.getKeyCode() == KeyEvent.VK_SPACE))
+            fire();
+        switch (e.getKeyCode()) {
+            case KeyEvent.VK_LEFT -> starship.setDX(-3);
+            case KeyEvent.VK_RIGHT -> starship.setDX(+3);
+            case KeyEvent.VK_R -> startGame(); // 게임 리셋
+            case KeyEvent.VK_ESCAPE -> System.exit(0); // 게임 종료
+        }
+
+    }

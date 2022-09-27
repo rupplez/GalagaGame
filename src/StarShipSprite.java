@@ -4,10 +4,11 @@ public class StarShipSprite extends Sprite {
     private GalagaGame game;
 
     public StarShipSprite(GalagaGame game, Image image, int x, int y) {
-        super(image, x, y);
+        super(game, image, x, y);
         this.game = game;
         dy = 0;
         dx = 0;
+        shootDir = -1;
     }
 
     @Override

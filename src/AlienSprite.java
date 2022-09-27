@@ -4,9 +4,10 @@ public class AlienSprite extends Sprite {
     private GalagaGame game;
 
     public AlienSprite(GalagaGame game, Image image, int x, int y) {
-        super(image, x, y);
+        super(game, image, x, y);
         this.game = game;
         dx = -3;
+        shootDir = 1;
     }
 
     @Override

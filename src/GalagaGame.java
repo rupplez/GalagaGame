@@ -6,9 +6,11 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Random;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 public class GalagaGame extends JPanel implements KeyListener {
@@ -21,8 +23,16 @@ public class GalagaGame extends JPanel implements KeyListener {
     private BufferedImage shipImage;
     private BufferedImage alienImage;
 
+    private int score;
+    private JLabel scoreLabel;
+    private int life;
+
     public GalagaGame() {
         JFrame frame = new JFrame("Galaga Game");
+
+        score = 0;
+        life = 3;
+        scoreLabel = new JLabel("SCORE : ");
 
         frame.setSize(800,600);
         frame.add(this);
@@ -37,33 +47,49 @@ public class GalagaGame extends JPanel implements KeyListener {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        //frame.add(scoreLabel);
+
         this.requestFocus();
         this.initSprites();
         addKeyListener(this);
     }
     private void initSprites() {
         starship = new StarShipSprite(this, shipImage, 370, 550);
-        sprites.add(starship);
+        this.addSprite(starship);
         for(int y=0;y<5;y++) {
             for(int x=0;x<12;x++) {
                 Sprite alien = new AlienSprite(this, alienImage, 100+(x*50), 50+y*30);
-                sprites.add(alien);
+                this.addSprite(alien);
             }
         }
+    }
+    public void addSprite(Sprite s) {
+        sprites.add(s);
     }
     private void startGame() {
         sprites.clear();
         initSprites();
     }
     public void endGame() {
+        System.out.println("GAME OVER");
         System.exit(0);
     }
     public void removeSprite(Sprite sprite) {
         sprites.remove(sprite);
     }
-    public void fire() {
-        ShotSprite shot = new ShotSprite(this, shotImage, starship.getX()+10, starship.getY()-30);
-        sprites.add(shot);
+    public void starShipAttacked() {
+        try{
+            if(life>1) {
+                Thread.sleep(2000);
+                life--;
+                startGame();
+            } else {
+                this.endGame();
+            }
+        } catch (Exception e) {
+
+        }
     }
     @Override
     public void paint(Graphics g) {
@@ -75,11 +101,19 @@ public class GalagaGame extends JPanel implements KeyListener {
             sprite.draw(g);
         }
     }
+    public void addScore(int amount) {
+        this.score += amount;
+        System.out.printf("SCORE : %d\n",score);
+    }
     public void gameLoop() {
         while(running) {
+            Random r = new Random(); //
             for(int i=0;i<sprites.size();i++) {
                 Sprite sprite = (Sprite)sprites.get(i);
                 sprite.move();
+                if(sprite instanceof AlienSprite && r.nextInt(1000)==1) {
+                    sprite.fire(shotImage);
+                }
             }
             for(int p=0;p<sprites.size();p++) {
                 for(int s=p+1;s<sprites.size();s++) {
@@ -107,15 +141,21 @@ public class GalagaGame extends JPanel implements KeyListener {
             starship.setDx(-3);
         if(e.getKeyCode()==KeyEvent.VK_RIGHT)
             starship.setDx(+3);
+        if(e.getKeyCode()==KeyEvent.VK_UP)
+            starship.setDy(-3);
+        if(e.getKeyCode()==KeyEvent.VK_DOWN)
+            starship.setDy(+3);
         if(e.getKeyCode()==KeyEvent.VK_SPACE)
-            fire();
+            starship.fire(shotImage);
+        if(e.getKeyCode()==KeyEvent.VK_F5) //
+            startGame();
     }
     @Override
     public void keyReleased(KeyEvent e) {
-        if(e.getKeyCode()==KeyEvent.VK_LEFT)
+        if(e.getKeyCode()==KeyEvent.VK_LEFT||e.getKeyCode()==KeyEvent.VK_RIGHT)
             starship.setDx(0);
-        if(e.getKeyCode()==KeyEvent.VK_RIGHT)
-            starship.setDx(0);
+        if(e.getKeyCode()==KeyEvent.VK_UP||e.getKeyCode()==KeyEvent.VK_DOWN)
+            starship.setDy(0);
     }
     @Override 
     public void keyTyped(KeyEvent e){

@@ -10,10 +10,13 @@ public class Sprite {
     protected int y; // 현쟈 위치의 y좌표
     protected int dx; // 단위시간에 움직이는 x 방향 거리
     protected int dy; // 단위시간 움직이는 y방향 거리
+    protected int shootDir;
     private Image image; // 스프라이트가 가지고 있는 이미지
+    private GalagaGame game;
 
     // 생성자
-    public Sprite(Image image, int x, int y) {
+    public Sprite(GalagaGame game, Image image, int x, int y) {
+        this.game = game;
         this.image = image;
         this.x = x;
         this.y = y;
@@ -40,6 +43,10 @@ public class Sprite {
         y += dy;
     }
 
+    public void fire(Image shotImg) {
+        ShotSprite shot = new ShotSprite(game, this, shotImg, x+10, y-30);
+        game.addSprite(shot);
+    }
     // dx를 설정한다.
     public void setDx(int dx) {
         this.dx = dx;
@@ -48,8 +55,7 @@ public class Sprite {
     // dy 설정
     public void setDy(int dy) {
         this.dy = dy;
-    }
-
+    }   
     
     // dx를 설정한다.
     public int getDx() {

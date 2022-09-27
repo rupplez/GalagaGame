@@ -6,7 +6,7 @@ public class AlienSprite extends Sprite {
     public AlienSprite(GalagaGame game, Image image, int x, int y) {
         super(game, image, x, y);
         this.game = game;
-        dx = -3;
+        dx = -6;
         shootDir = 1;
     }
 

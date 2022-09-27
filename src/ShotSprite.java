@@ -8,7 +8,7 @@ public class ShotSprite extends Sprite {
         super(game, image, x, y);
         this.game = game;
         this.owner = owner;
-        dy = 3 * owner.shootDir;
+        dy = 9 * owner.shootDir;
     }
 
     @Override

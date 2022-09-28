@@ -57,12 +57,10 @@ public class Sprite {
         this.dy = dy;
     }   
     
-    // dx를 설정한다.
     public int getDx() {
         return dx;
     }
 
-    // dy 설정
     public int getDy() {
         return dy;
     }

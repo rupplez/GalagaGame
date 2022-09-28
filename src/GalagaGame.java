@@ -67,11 +67,11 @@ public class GalagaGame extends JPanel implements KeyListener {
 
     private void newStarShip() { //
         starship = new StarShipSprite(this, shipImage, 370, 450);
+        this.addSprite(starship);
     }
 
     private void initSprites() {
         newStarShip();
-        this.addSprite(starship);
         for (int y = 0; y < 5; y++) {
             for (int x = 0; x < 12; x++) {
                 Sprite alien = new AlienSprite(this, alienImage, 100 + (x * 50), 50 + y * 30);
@@ -129,7 +129,6 @@ public class GalagaGame extends JPanel implements KeyListener {
                 // }
                 //sprites.clear();
                 newStarShip();
-                this.addSprite(starship);
             } else {
                 endGame();
             }
@@ -173,9 +172,24 @@ public class GalagaGame extends JPanel implements KeyListener {
             for (int i = 0; i < sprites.size(); i++) {
                 Sprite sprite = (Sprite) sprites.get(i);
                 sprite.move();
-                if (sprite instanceof AlienSprite && r.nextInt(500) == 1) {
-                    sprite.fire(shotImage);
-                }
+                if (sprite instanceof AlienSprite) {
+                    int temp = r.nextInt(10000);
+                    if(temp/10==1)
+                        sprite.fire(shotImage);
+                    // else if(temp==1) {
+                    //     int sprX=sprite.getX();
+                    //     int sprY=sprite.getY();
+                    //     int sX=starship.getX();
+                    //     int sY=starship.getY();
+                    //     sprite.setDy(
+
+                    //     (int)((sprX*sprY+sX*sY)
+                    //     /(Math.sqrt(sprX*sprX+sX*sX)*Math.sqrt(sprY*sprY+sY*sY)))
+
+
+                    //     );
+                    // }
+                } 
             }
             for (int p = 0; p < sprites.size(); p++) {
                 for (int s = p + 1; s < sprites.size(); s++) {

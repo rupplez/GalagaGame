@@ -25,7 +25,7 @@ public class StarShipSprite extends Sprite {
     @Override
     public void handleCollision(Sprite other) {
         if (other instanceof AlienSprite) {
-            game.endGame();
+            //game.endGame();
         }
     }
 }

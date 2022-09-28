@@ -34,6 +34,8 @@ public class GalagaGame extends JPanel implements KeyListener {
     private JLabel scoreLabel;
     private int life;
     private int starShipSpeed = 9;
+    
+    private int stage;
 
     public GalagaGame() {
         JFrame frame = new JFrame("Galaga Game");
@@ -41,6 +43,8 @@ public class GalagaGame extends JPanel implements KeyListener {
         score = 0;
         life = 3;
         scoreLabel = new JLabel("SCORE : ");
+
+        stage = 1;
 
         frame.setSize(800, 600);
         frame.add(this);
@@ -64,6 +68,7 @@ public class GalagaGame extends JPanel implements KeyListener {
 
         this.requestFocus();
         this.initSprites();
+        //this.resetGame();
         addKeyListener(this);
     }
 
@@ -74,7 +79,7 @@ public class GalagaGame extends JPanel implements KeyListener {
 
     private void initSprites() {
         newStarShip();
-        for (int y = 0; y < 5; y++) {
+        for (int y = 0; y < 2 + stage-1; y++) {
             for (int x = 0; x < 12; x++) {
                 Sprite alien = new AlienSprite(this, alienImage, 100 + (x * 50), 50 + y * 30);
                 this.addSprite(alien);
@@ -87,15 +92,11 @@ public class GalagaGame extends JPanel implements KeyListener {
         sprites.add(s);
     }
 
-    private void startGame() {
-        sprites.clear();
-        initSprites();
-    }
-
     private void resetGame() {
         life = 3;
         score = 0;
         aliens = 0;
+        stage = 1;
         sprites.clear();
         initSprites();
     }
@@ -115,7 +116,11 @@ public class GalagaGame extends JPanel implements KeyListener {
         clear = 2;
         try {
             Thread.sleep(3000);
-            clear = 0;
+            clear = 1;
+            stage++;
+            sprites.clear();
+            System.out.printf("--STAGE %d--\n",stage);
+            initSprites();
         } catch (Exception ex) {
         }
     }
@@ -203,7 +208,7 @@ public class GalagaGame extends JPanel implements KeyListener {
                 sprite.move();
                 if (sprite instanceof AlienSprite) {
                     int temp = r.nextInt(10000);
-                    if(temp/10==1)
+                    if(temp/(10*stage)==1)
                         sprite.fire(shotImage);
                     // else if(temp==1) {
                     //     int sprX=sprite.getX();
@@ -248,6 +253,10 @@ public class GalagaGame extends JPanel implements KeyListener {
     public void keyPressed(KeyEvent e) {
         if (clear == 0 && (e.getKeyCode() == KeyEvent.VK_SPACE)) {
             clear = 1;
+            
+            System.out.printf("--GAME START--\n");
+            System.out.println("--STAGE 1--");
+    
             resetGame();
         } else if (clear == 1 && (e.getKeyCode() == KeyEvent.VK_SPACE)) {
             starship.fire(shotImage);

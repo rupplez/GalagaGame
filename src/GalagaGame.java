@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Random;
-import java.util.Timer;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
@@ -17,9 +16,9 @@ import javax.swing.JPanel;
 
 public class GalagaGame extends JPanel implements KeyListener {
     private boolean running = true;
-    private static boolean start = false;
-    private static boolean end = false;
-    private Timer time = new Timer();
+    private static int clear = 0;
+
+    public int aliens = 0;
 
     private ArrayList sprites = new ArrayList<>();
     private Sprite starship;
@@ -29,10 +28,12 @@ public class GalagaGame extends JPanel implements KeyListener {
     private BufferedImage alienImage;
     private BufferedImage mainImage;
     private BufferedImage endImage;
+    private BufferedImage clearImage;
 
     private int score;
     private JLabel scoreLabel;
     private int life;
+    private int starShipSpeed = 9;
 
     public GalagaGame() {
         JFrame frame = new JFrame("Galaga Game");
@@ -49,6 +50,7 @@ public class GalagaGame extends JPanel implements KeyListener {
 
         try {
             mainImage = ImageIO.read(new File("images/mainImage.png"));
+            clearImage = ImageIO.read(new File("images/clear.png"));
             endImage = ImageIO.read(new File("images/gameover.jpg"));
             shotImage = ImageIO.read(new File("images/fire.png"));
             shipImage = ImageIO.read(new File("images/starship02.jpg"));
@@ -76,6 +78,7 @@ public class GalagaGame extends JPanel implements KeyListener {
             for (int x = 0; x < 12; x++) {
                 Sprite alien = new AlienSprite(this, alienImage, 100 + (x * 50), 50 + y * 30);
                 this.addSprite(alien);
+                aliens += 1;
             }
         }
     }
@@ -92,17 +95,27 @@ public class GalagaGame extends JPanel implements KeyListener {
     private void resetGame() {
         life = 3;
         score = 0;
+        aliens = 0;
         sprites.clear();
         initSprites();
     }
 
     public void endGame() {
         System.out.println("GAME OVER");
-        end = true;
+        clear = 3;
         try {
             Thread.sleep(3000);
-            start = false;
-            end = false;
+            clear = 0;
+        } catch (Exception ex) {
+        }
+    }
+
+    public void clearGame() {
+        System.out.println("GAME CLEAR");
+        clear = 2;
+        try {
+            Thread.sleep(3000);
+            clear = 0;
         } catch (Exception ex) {
         }
     }
@@ -139,32 +152,48 @@ public class GalagaGame extends JPanel implements KeyListener {
 
     @Override
     public void paint(Graphics g) {
-        if (end == true) {
-            repaint();
-            super.paint(g);
-            g.setColor(Color.black);
-            g.fillRect(0, 0, 800, 600);
-            g.drawImage(endImage, 0, 0, null);
-        } else if (start == false) {
-            super.paint(g);
-            g.setColor(Color.white);
-            g.drawImage(mainImage, 0, 0, null);
-        } else if (start == true) {
-            repaint();
-            super.paint(g);
-            g.setColor(Color.black);
-            g.fillRect(0, 0, 800, 600);
-            for (int i = 0; i < sprites.size(); i++) {
-                Sprite sprite = (Sprite) sprites.get(i);
-                sprite.draw(g);
-            }
+        switch (clear) {
+            case 0:
+                super.paint(g);
+                g.drawImage(mainImage, 0, 0, null);
+                break;
+            case 1:
+                repaint();
+                super.paint(g);
+                g.setColor(Color.black);
+                g.fillRect(0, 0, 800, 600);
+                for (int i = 0; i < sprites.size(); i++) {
+                    Sprite sprite = (Sprite) sprites.get(i);
+                    sprite.draw(g);
+                }
+                break;
+            case 2:
+                repaint();
+                super.paint(g);
+                g.fillRect(0, 0, 800, 600);
+                g.drawImage(clearImage, 0, 0, null);
+                break;
+            case 3:
+                repaint();
+                super.paint(g);
+                g.fillRect(0, 0, 800, 600);
+                g.drawImage(endImage, 0, 0, null);
+                break;
         }
     }
 
     public void addScore(int amount) {
         this.score += amount;
+        aliens--; //
         System.out.printf("SCORE : %d\n", score);
+        System.out.printf("Aliens : %d\n", aliens);
     }
+
+    // public void minusScore(int amount) {
+    //     this.score -= amount;
+    //     aliens--; //
+    //     System.out.println("You missed 1 AlienShip!");
+    // }
 
     public void gameLoop() {
         while (running) {
@@ -209,21 +238,25 @@ public class GalagaGame extends JPanel implements KeyListener {
             } catch (Exception e) {
 
             }
+            if (aliens == 0 && clear == 1) {
+                clearGame();
+            }
         }
     }
 
     @Override
     public void keyPressed(KeyEvent e) {
-        if (start == false && (e.getKeyCode() == KeyEvent.VK_SPACE)) {
-            start = true;
+        if (clear == 0 && (e.getKeyCode() == KeyEvent.VK_SPACE)) {
+            clear = 1;
             resetGame();
-        } else if (start == true && (e.getKeyCode() == KeyEvent.VK_SPACE))
+        } else if (clear == 1 && (e.getKeyCode() == KeyEvent.VK_SPACE)) {
             starship.fire(shotImage);
+        }
         switch (e.getKeyCode()) {
-            case KeyEvent.VK_LEFT -> starship.setDx(-6);
-            case KeyEvent.VK_RIGHT -> starship.setDx(+6);
-            case KeyEvent.VK_UP -> starship.setDy(-6);
-            case KeyEvent.VK_DOWN -> starship.setDy(+6);
+            case KeyEvent.VK_LEFT -> starship.setDx(-starShipSpeed);
+            case KeyEvent.VK_RIGHT -> starship.setDx(+starShipSpeed);
+            case KeyEvent.VK_UP -> starship.setDy(-starShipSpeed);
+            case KeyEvent.VK_DOWN -> starship.setDy(+starShipSpeed);
             case KeyEvent.VK_R -> resetGame();
             case KeyEvent.VK_ESCAPE -> System.exit(0);
         }
